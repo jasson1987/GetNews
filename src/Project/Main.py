@@ -19,6 +19,7 @@ from Func_sohu import LotterySohu
 from Func_lot500 import Lottery500
 from Func_oko import LotteryOko
 from Func_ac import LotteryAc
+from Func_joyc import LotteryJoyc
 from Func import Checkurl,GetHeader
 import sys
 reload(sys)
@@ -362,6 +363,38 @@ class GetWebNews():
                                 else:
                                     print 'Exists'
                     print 'Ac-finish %d' % NewsKind
+                    
+            elif site == '快乐福彩':    
+                print 'joyc'
+                lot = LotteryJoyc()
+                for NewsKind in range(1,5):
+                    for NewsType in range(1,9):
+                        url = lot.GetAllNews(NewsKind,NewsType)
+                        res = GetHeader(url)
+                        if res == '':
+                            print 'Time Out!'
+                            soup = ''
+                        else:    
+                            soup = bs(res,'html.parser')
+                        if soup <> '':
+                            souplist = soup.find('div',attrs={'class':'main clearfix'})
+                            for li in souplist('li',limit=lmt):
+                                for a in li('a',attrs={'target':'_blank'}):
+                                    href = a['href']
+                                    title = a.text.strip()
+                                    mainurl = 'http://www.joycail.com%s' % href.replace('http://www.joycail.com','')
+                                    IsExists = Checkurl(mainurl,title)
+                                    if IsExists == 0:
+                                        try:
+                                            lot.InsData(mainurl,NewsKind,NewsType,DD)
+                                            print 'succ %d--%d' % (NewsKind,NewsType)
+                                        except:
+                                            print 'fail %d--%d--url:%s' % (NewsKind,NewsType,mainurl)
+                                        finally:
+                                            pass
+                                    else:
+                                        print 'Exists'
+                    print 'Ac-Joyc %d' % NewsKind
 
 # lot = Lottery()
 # for web in range(1,5):

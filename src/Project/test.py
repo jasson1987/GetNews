@@ -30,35 +30,46 @@ datedif = -1
 lmt = 20
 
 
+url = 'http://www.joycail.com/html/fucaiyaowen/20180420/7321.html'
+rep = requests.get(url, timeout=5)
+res = rep.content
+soup = bs(res,'html.parser')
 
-for NewsKind in range(1,10):
-    for NewsType in range (1,6):
-        lot = Lotteryzhcw()
-        url = lot.GetAllNews(NewsKind,NewsType)
-        print url
-        res = GetHeader(url)
-        if res == '':
-            print 'Time Out!!'
-        else :
-            soup = bs(res,'html.parser')
-            newslist = soup.findAll(attrs={'class':'Nlink'},limit = lmt)
-            for listurl in newslist:
-                for item in listurl('a'):
-                    mainurl = 'http://www.zhcw.com/%s' % item['href']
-                    title = item.text.strip()
-                    IsExists = Checkurl(mainurl,title)
-                    if IsExists == 0:
-                        try:
-                            lot.InsData(mainurl, NewsKind,NewsType, DD)
-                            print 'succ  %d--%d' % (NewsKind,NewsType)
-                        except:
-                            print 'fail  %d--%d--url:%s' % (NewsKind,NewsType,mainurl)
-                        finally:
-                            pass
-                    else:
-                        print 'Exists'
-    
-    
+soupinfo = soup.find('div',attrs={'class','w700 fl'})
+print soupinfo
+
+souptitle = soupinfo.find('dt')
+title = souptitle.text.strip()
+print title
+
+infolist = soup.find('dd',attrs={'class':'dd_time'})('span')
+timestr = infolist[0].text.replace('发布时间：','')
+source = infolist[1].text.replace('来源：','')
+
+print source
+
+newstime = datetime.datetime.strptime(timestr,'%Y-%m-%d %H:%M')
+print newstime
+
+
+soupcon = soup.find('dd',attrs={'class':'dd_content'})
+
+newstxt = ''
+for con in soupcon('p'):
+    newstxt = newstxt + con.text.strip()
+
+print newstxt
+
+
+
+cmt = 0
+author = ''
+
+
+
+
+
+
 
 
 
